@@ -2,6 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '../components/Login'
 import Home from '../components/Home'
+import Welcome from "../components/Welcome";
+import Users from "../components/user/Users";
 
 Vue.use(VueRouter)
 
@@ -16,12 +18,30 @@ const routes = [
   },
   {
     path: '/home',
-    component: Home
-  }
+    component: Home,
+    redirect: '/welcome',
+    children: [
+      {
+        path: '/welcome',
+        component: Welcome
+      },
+      {
+        path: '/users',
+        component: Users
+      }
+    ]
+  },
 ]
 
+//解决组件连点报错
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
+
 const router = new VueRouter({
-  routes
+  routes,
+  mode: 'history',
 })
 
 //挂载路由导航守卫 控制页面访问权限
